@@ -1,0 +1,66 @@
+name: FanFlow AI CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  backend-test:
+    name: Backend Test Suite (Python 3.12/3.14)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run Pytest with Coverage
+        run: |
+          cd backend
+          python -m pytest tests/ --cov=app --cov-report=xml
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  frontend-test:
+    name: Frontend Test & Audit Suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-size: 20
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+      - name: Run Vitest Unit Tests
+        run: |
+          cd frontend
+          npm run test
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
+      - name: Install Playwright Browsers
+        run: |
+          cd frontend
+          npx playwright install chromium --with-deps
+      - name: Run Playwright E2E Tests (Mocked)
+        run: |
+          cd frontend
+          npx playwright test
+      - name: Run Lighthouse CI Audits
+        run: |
+          cd frontend
+          npm run build
+          npx lhci autorun --config=../lighthouserc.json
