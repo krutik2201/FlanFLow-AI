@@ -42,3 +42,9 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# Temp and test outputs
+frontend/tmp/
+frontend/playwright-report/
+frontend/test-results/
+

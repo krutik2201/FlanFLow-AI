@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { api, RouteResponse, VenueNode, VenueEdge } from '../api/client'
 import { useAI, useTranslation } from '../context/AIContext'
 import { VenueGraphMap } from '../components/VenueGraphMap'
+import { useSEO } from '../hooks/useSEO'
 
 const MODES = [
   { value: 'standard',   label: 'Standard',    icon: '🚶' },
@@ -25,6 +26,8 @@ function WalkTimeLabel({ seconds }: { seconds: number }) {
 export default function Wayfinding() {
   const { aiOffline, language } = useAI()
   const { t } = useTranslation()
+  useSEO('title_wayfinding', 'meta_desc_wayfinding')
+
   const [nodes, setNodes] = useState<VenueNode[]>([])
   const [edges, setEdges] = useState<VenueEdge[]>([])
   const [origin, setOrigin] = useState('gate_a')
@@ -91,7 +94,7 @@ export default function Wayfinding() {
           id={id}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="bg-surface-700 border border-brand-700/40 text-brand-900 rounded-lg px-3 py-2
+          className="bg-surface-700 border border-brand-700/40 text-brand-900 rounded-lg px-3 py-3 h-12
                      text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
         >
           {Object.entries(nodeGroups).map(([group, groupNodes]) =>
@@ -110,7 +113,6 @@ export default function Wayfinding() {
 
   return (
     <>
-      <title>{t('wayfinding')} — FanFlow AI</title>
       <div className="animate-fade-in">
         <h1 className="text-2xl font-bold text-brand-900 mb-1">{t('title_wayfinding')}</h1>
         <p className="text-brand-400 text-sm mb-6">
@@ -155,7 +157,7 @@ export default function Wayfinding() {
                       id={`mode-${m.value}`}
                       onClick={() => setMode(m.value as 'standard' | 'accessible')}
                       aria-pressed={mode === m.value}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
+                      className={`flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium min-h-[48px] h-12
                                   transition-colors border focus:outline-none focus-visible:ring-2
                                   focus-visible:ring-brand-400
                                   ${mode === m.value
@@ -171,13 +173,13 @@ export default function Wayfinding() {
               </div>
 
               {/* Congestion aware */}
-              <label className="flex items-center gap-3 cursor-pointer group" htmlFor="congestion-toggle">
+              <label className="flex items-center gap-3 cursor-pointer group py-2.5 min-h-[48px]" htmlFor="congestion-toggle">
                 <input
                   id="congestion-toggle"
                   type="checkbox"
                   checked={congestionAware}
                   onChange={(e) => setCongestionAware(e.target.checked)}
-                  className="h-4 w-4 rounded border-brand-700 bg-surface-700 text-brand-600
+                  className="h-5 w-5 rounded border-brand-700 bg-surface-700 text-brand-600
                              focus:ring-brand-400 focus:ring-2 focus:ring-offset-0"
                 />
                 <span className="text-sm text-brand-300 group-hover:text-brand-200">
@@ -189,9 +191,9 @@ export default function Wayfinding() {
                 id="find-route-btn"
                 onClick={handleRoute}
                 disabled={loading || !origin || !destination || origin === destination}
-                className="w-full py-3 px-4 bg-brand-600 hover:bg-brand-500 disabled:bg-surface-600
+                className="w-full py-3.5 px-4 bg-brand-600 hover:bg-brand-500 disabled:bg-surface-600
                            disabled:text-brand-400 text-white font-semibold rounded-lg transition-colors
-                           focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
+                           focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 min-h-[48px] h-12"
                 aria-busy={loading}
               >
                 {loading ? t('computing') : `🗺️ ${t('find_route')}`}

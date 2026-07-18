@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { api, TransportScoreResponse } from '../api/client'
 import { useAI, useTranslation } from '../context/AIContext'
 import { useTelemetry } from '../hooks/useTelemetry'
+import { useSEO } from '../hooks/useSEO'
 
 const TRANSPORT_MODES = [
   { mode: 'transit',   label: 'Rail / Metro',  icon: '🚇', color: '#3d7eff', desc: 'Lowest emissions' },
@@ -30,6 +31,8 @@ export default function SustainableTransport() {
   const { aiOffline, language } = useAI()
   const { t } = useTranslation()
   const telemetry = useTelemetry()
+  useSEO('title_transport', 'meta_desc_transport')
+
   const [selected, setSelected] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<TransportScoreResponse | null>(null)
@@ -59,7 +62,6 @@ export default function SustainableTransport() {
 
   return (
     <>
-      <title>{t('title_transport')} — FanFlow AI</title>
       <div className="animate-fade-in">
         <h1 className="text-2xl font-bold text-brand-900 mb-1">{t('title_transport')}</h1>
         <p className="text-brand-400 text-sm mb-6">
@@ -217,7 +219,7 @@ export default function SustainableTransport() {
           {!result && !loading && (
             <div className="glass-card p-8 flex items-center justify-center text-brand-500 text-sm">
               {language === 'es' ? 'Seleccione un modo de transporte para ver la comparación de carbono y ETA' :
-               language === 'fr' ? 'Sélectionnez un mode de transport pour voir la comparaison de carbone et d\'ETA' :
+               language === 'fr' ? 'Seleccione un mode de transport pour voir la comparaison de carbone et d\'ETA' :
                language === 'ar' ? 'اختر وسيلة نقل لعرض مقارنة الكربون والوقت المتوقع للوصول' :
                language === 'pt' ? 'Selecione um modo de transporte para ver a comparação de carbono e ETA' :
                language === 'zh' ? '请选择一种出行方式以查看碳足迹及预计到达时间对比' :

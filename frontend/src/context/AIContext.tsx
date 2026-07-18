@@ -54,6 +54,9 @@ export const translations: Record<string, Record<string, string>> = {
     simulate_ai: 'Simulate AI Offline',
     offline: 'OFFLINE',
     footer_text: 'GenAI never computes routes or distances — deterministic engine only',
+    meta_desc_wayfinding: 'FanFlow AI — Fast and reliable stadium routing and wayfinding for FIFA World Cup 2026. Get deterministic directions with AI-phrased context.',
+    meta_desc_accessibility: 'FanFlow AI — Accessible, step-free navigation, assistance profiles, and accessible amenities finder for World Cup stadium visitors.',
+    meta_desc_transport: 'FanFlow AI — Compare carbon emissions, costs, and ETAs for sustainable transit, rideshare, and parking to get to the stadium.',
   },
   es: {
     wayfinding: 'Navegación',
@@ -94,6 +97,9 @@ export const translations: Record<string, Record<string, string>> = {
     simulate_ai: 'Simular IA Fuera de Línea',
     offline: 'DESCONECTADO',
     footer_text: 'La IA nunca calcula rutas o distancias — solo motor determinista',
+    meta_desc_wayfinding: 'FanFlow AI — Rutas rápidas y confiables en el estadio para la Copa Mundial de la FIFA 2026. Obtenga direcciones deterministas con contexto redactado por IA.',
+    meta_desc_accessibility: 'FanFlow AI — Navegación accesible y sin escalones, perfiles de asistencia y buscador de servicios accesibles para los visitantes del estadio de la Copa Mundial.',
+    meta_desc_transport: 'FanFlow AI — Compare emisiones de carbono, costos y ETA de transporte sostenible, viaje compartido y estacionamiento para llegar al estadio.',
   },
   fr: {
     wayfinding: 'Guidage',
@@ -134,6 +140,9 @@ export const translations: Record<string, Record<string, string>> = {
     simulate_ai: 'Simuler l\'IA Hors Ligne',
     offline: 'HORS LIGNE',
     footer_text: 'L\'IA ne calcule jamais les itinéraires ou les distances — moteur déterministe uniquement',
+    meta_desc_wayfinding: 'FanFlow AI — Guidage rapide et fiable dans le stade pour la Coupe du Monde de la FIFA 2026. Obtenez des itinéraires déterministes avec contexte formulé par l\'IA.',
+    meta_desc_accessibility: 'FanFlow AI — Navigation accessible et sans marches, profils d\'assistance et recherche d\'équipements accessibles pour les visiteurs du stade de la Coupe du Monde.',
+    meta_desc_transport: 'FanFlow AI — Comparez les émissions de carbone, les coûts et les ETA pour les transports en commun durables, le covoiturage et le parking pour aller au stade.',
   },
   ar: {
     wayfinding: 'التوجيه',
@@ -173,7 +182,10 @@ export const translations: Record<string, Record<string, string>> = {
     sustainable_option: 'خيار مستدام',
     simulate_ai: 'محاكاة غياب الذkاء الاصطناعي',
     offline: 'غير متصل',
-    footer_text: 'لا يقوم الذكاء الاصطناعي مطلقًا بحساب المسارات أو المسافات - المحرك الحتمي فقط',
+    footer_text: 'لا يقوم الذكاء الاصطناعي مطلقًا بحساب المسارات أو المسafات - المحرك الحتمي فقط',
+    meta_desc_wayfinding: 'FanFlow AI - توجيه وتحديد مسار سريع وموثوق في الملعب لكأس العالم لكرة القدم 2026. احصل على اتجاهات حتمية مع سياق مصاغ بواسطة الذكاء الاصطناعي.',
+    meta_desc_accessibility: 'FanFlow AI - ملاحة سهلة الوصول وخالية من الدرج، وملفات مساعدة، وباحث عن المرافق الميسرة لزوار ملعب كأس العالم.',
+    meta_desc_transport: 'FanFlow AI - قارن بين انبعاثات الكربون والتكاليف والأوقات المتوقعة للوصول لوسائل النقل المستدام، ومشاركة الركوب، ومواقف السيارات للوصول إلى الملعب.',
   },
   pt: {
     wayfinding: 'Navegação',
@@ -214,6 +226,9 @@ export const translations: Record<string, Record<string, string>> = {
     simulate_ai: 'Simular IA Offline',
     offline: 'OFFLINE',
     footer_text: 'A IA nunca calcula rotas ou distâncias — apenas motor determinístico',
+    meta_desc_wayfinding: 'FanFlow AI — Rotas rápidas e confiáveis no estádio para a Copa do Mundo da FIFA 2026. Obtenha direções determinísticas com contexto gerado por IA.',
+    meta_desc_accessibility: 'FanFlow AI — Navegação acessível e sem degraus, perfis de assistência e busca de serviços acessíveis para os visitantes do estádio da Copa do Mundo.',
+    meta_desc_transport: 'FanFlow AI — Compare emissões de carbono, custos e ETA para trânsito sustentável, carona compartilhada e estacionamento para chegar ao estádio.',
   },
   zh: {
     wayfinding: '寻路导航',
@@ -254,6 +269,9 @@ export const translations: Record<string, Record<string, string>> = {
     simulate_ai: '模拟人工智能离线',
     offline: '离线模式',
     footer_text: '人工智能绝不计算路线或距离 — 仅使用确定性计算引擎',
+    meta_desc_wayfinding: 'FanFlow AI — 针对 2026 年国际足联世界杯场馆的快速且可靠的寻路导航服务。获取由人工智能生成上下文的确定性路线指引。',
+    meta_desc_accessibility: 'FanFlow AI — 提供无障碍、无台阶导航、协助方案选择以及附近无障碍设施查询服务，为世界杯观众保驾护航。',
+    meta_desc_transport: 'FanFlow AI — 比较前往体育场的绿色交通、网约车和自驾泊车的碳排放、费用及预计到达时间。',
   },
   de: {
     wayfinding: 'Wegfindung',
@@ -294,7 +312,10 @@ export const translations: Record<string, Record<string, string>> = {
     simulate_ai: 'KI-Offline-Modus simulieren',
     offline: 'OFFLINE',
     footer_text: 'KI berechnet niemals Routen oder Distanzen — nur deterministische Engine',
-  }
+    meta_desc_wayfinding: 'FanFlow AI — Schnelle und zuverlässige Stadion-Wegfindung für die FIFA Fussball-Weltmeisterschaft 2026. Erhalten Sie deterministische Wegbeschreibungen mit KI-formuliertem Kontext.',
+    meta_desc_accessibility: 'FanFlow AI — Barrierefreie, stufenlose Navigation, Hilfebedarfsprofile und barrierefreier Einrichtungsfinder für Stadionbesucher.',
+    meta_desc_transport: 'FanFlow AI — Vergleichen Sie CO2-Emissionen, Kosten und ETAs für nachhaltige Verkehrsmittel, Fahrgemeinschaften und Parkplätze, um zum Stadion zu gelangen.',
+  },
 }
 
 export function AIProvider({ children }: { children: ReactNode }) {

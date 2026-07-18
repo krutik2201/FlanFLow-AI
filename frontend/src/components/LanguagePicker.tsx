@@ -21,7 +21,7 @@ export function LanguagePicker() {
         value={language}
         onChange={(e) => setLanguage(e.target.value)}
         className="appearance-none bg-surface-700 border border-brand-700/40 text-brand-200
-                   rounded-lg px-3 py-1.5 text-sm font-medium cursor-pointer
+                   rounded-lg px-4 py-3 h-12 text-sm font-medium cursor-pointer
                    hover:border-brand-500 transition-colors focus:outline-none focus-visible:ring-2
                    focus-visible:ring-brand-400"
         aria-label="Select navigation language"

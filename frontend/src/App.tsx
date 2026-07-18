@@ -49,14 +49,14 @@ function AppLayout() {
             </NavLink>
 
             {/* Primary nav */}
-            <nav className="hidden md:flex items-center gap-1 flex-1" aria-label="Main navigation">
+            <nav className="hidden md:flex items-center gap-2 flex-1" aria-label="Main navigation">
               {NAV_LINKS.map((link) => (
                 <NavLink
                   key={link.to}
                   to={link.to}
                   end={link.to === '/'}
                   className={({ isActive }) =>
-                    `flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors
+                    `flex items-center gap-1.5 px-4 py-3 rounded-lg text-sm font-medium min-h-[48px] h-12 transition-colors
                      ${isActive
                        ? 'bg-brand-100 text-brand-900 border border-brand-200/80 shadow-sm'
                        : 'text-brand-400 hover:text-brand-200 hover:bg-surface-700'
@@ -83,7 +83,7 @@ function AppLayout() {
 
         {/* ── Mobile nav ──────────────────────────────────────── */}
         <nav
-          className="md:hidden flex items-center gap-1 overflow-x-auto px-3 py-2
+          className="md:hidden flex items-center gap-2 overflow-x-auto px-3 py-3
                      bg-surface-800 border-b border-brand-900/40"
           aria-label="Mobile navigation"
         >
@@ -93,7 +93,7 @@ function AppLayout() {
               to={link.to}
               end={link.to === '/'}
               className={({ isActive }) =>
-                `flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium shrink-0 transition-colors
+                `flex items-center gap-1.5 px-4 py-3 rounded-lg text-sm font-medium shrink-0 min-h-[48px] h-12 transition-colors
                  ${isActive
                    ? 'bg-brand-100 text-brand-900 border border-brand-200/50 shadow-sm'
                    : 'text-brand-400 hover:text-brand-200'

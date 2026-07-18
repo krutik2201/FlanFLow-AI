@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { api, RouteResponse, VenueNode, VenueEdge } from '../api/client'
 import { useAI, useTranslation } from '../context/AIContext'
 import { VenueGraphMap } from '../components/VenueGraphMap'
+import { useSEO } from '../hooks/useSEO'
 
 const ACCESSIBILITY_NEEDS = [
   { id: 'wheelchair',     label: 'Wheelchair user',           icon: '♿', dest: 'elevator_north' },
@@ -22,6 +23,8 @@ const ACCESSIBLE_AMENITIES = [
 export default function Accessibility() {
   const { aiOffline, language } = useAI()
   const { t } = useTranslation()
+  useSEO('title_accessibility', 'meta_desc_accessibility')
+
   const [nodes, setNodes] = useState<VenueNode[]>([])
   const [edges, setEdges] = useState<VenueEdge[]>([])
   const [needs, setNeeds] = useState<Set<string>>(new Set())
@@ -88,7 +91,6 @@ export default function Accessibility() {
 
   return (
     <>
-      <title>{t('accessibility')} — FanFlow AI</title>
       <div className="animate-fade-in">
         <h1 className="text-2xl font-bold text-brand-900 mb-1">{t('title_accessibility')}</h1>
         <p className="text-brand-400 text-sm mb-6">
@@ -96,7 +98,7 @@ export default function Accessibility() {
            language === 'fr' ? 'Itinéraire sans marches avec alternatives d\'ascenseur. Les itinéraires à escaliers uniquement sont exclus.' :
            language === 'ar' ? 'مسار خالٍ من الدرج مع بدائل المصعد. يتم استبعاد المسارات التي تحتوي على درج فقط تلقائيًا.' :
            language === 'pt' ? 'Rota sem degraus com alternativas de elevador. Os caminhos apenas com escadas são excluídos automaticamente.' :
-           language === 'zh' ? '无台阶路线及电梯备选。仅包含台阶的路径将自动排除。' :
+           language === 'zh' ? '无台阶路线及电梯备选。仅包含台阶 of 路径将自动排除。' :
            language === 'de' ? 'Stufenlose Routenführung mit Aufzugsalternativen. Reine Treppenwege werden automatisch ausgeschlossen.' :
            'Step-free routing with elevator alternatives. Stair-only paths are automatically excluded.'}
         </p>
@@ -110,13 +112,13 @@ export default function Accessibility() {
               </h2>
               <div className="flex flex-col gap-2" role="group" aria-label="Select accessibility needs">
                 {ACCESSIBILITY_NEEDS.map((n) => (
-                  <label key={n.id} htmlFor={`need-${n.id}`} className="flex items-center gap-3 cursor-pointer p-2 rounded-lg hover:bg-surface-700 transition-colors">
+                  <label key={n.id} htmlFor={`need-${n.id}`} className="flex items-center gap-3 cursor-pointer p-3 min-h-[48px] rounded-lg hover:bg-surface-700 transition-colors">
                     <input
                       id={`need-${n.id}`}
                       type="checkbox"
                       checked={needs.has(n.id)}
                       onChange={() => toggleNeed(n.id)}
-                      className="h-4 w-4 rounded border-brand-700 bg-surface-700 text-brand-500 focus:ring-brand-400"
+                      className="h-5 w-5 rounded border-brand-700 bg-surface-700 text-brand-500 focus:ring-brand-400"
                     />
                     <span aria-hidden="true" className="text-lg">{n.icon}</span>
                     <span className="text-sm text-brand-200">
@@ -137,7 +139,7 @@ export default function Accessibility() {
                   {t('origin')}
                 </label>
                 <select id="acc-origin" value={origin} onChange={(e) => setOrigin(e.target.value)}
-                  className="w-full bg-surface-700 border border-brand-700/40 text-brand-900 rounded-lg px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400">
+                  className="w-full bg-surface-700 border border-brand-700/40 text-brand-900 rounded-lg px-3 py-3 h-12 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400">
                   {gateNodes.map((n) => <option key={n.id} value={n.id}>{n.name}</option>)}
                 </select>
               </div>
@@ -146,7 +148,7 @@ export default function Accessibility() {
                   {t('destination')}
                 </label>
                 <select id="acc-dest" value={destination} onChange={(e) => setDestination(e.target.value)}
-                  className="w-full bg-surface-700 border border-brand-700/40 text-brand-900 rounded-lg px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400">
+                  className="w-full bg-surface-700 border border-brand-700/40 text-brand-900 rounded-lg px-3 py-3 h-12 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400">
                   {sectionNodes.map((n) => <option key={n.id} value={n.id}>{n.name}</option>)}
                 </select>
               </div>
@@ -154,9 +156,9 @@ export default function Accessibility() {
                 id="find-accessible-route-btn"
                 onClick={findAccessibleRoute}
                 disabled={loading}
-                className="w-full py-2.5 px-4 bg-brand-600 hover:bg-brand-500 disabled:bg-surface-600
+                className="w-full py-3 px-4 bg-brand-600 hover:bg-brand-500 disabled:bg-surface-600
                            disabled:text-brand-400 text-white font-semibold rounded-lg transition-colors
-                           focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
+                           focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 min-h-[48px] h-12"
               >
                 {loading ? t('computing') : `♿ ${t('find_route')}`}
               </button>
