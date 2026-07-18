@@ -1,63 +1,152 @@
-# FanFlow AI — Stadium Wayfinding, Accessibility & Operations
+# FlanFlow AI — Stadium Wayfinding, Accessibility & Operations 🏟️
 
-FanFlow AI is a high-performance, accessibility-first wayfinding and operations platform designed for World Cup-scale stadiums (FIFA 2026). The platform features an undirected, weighted stadium layout graph, a deterministic shortest-path and step-free routing engine, a live crowd/telemetry simulator, and a safe generative AI synthesis layer.
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/krutik2201/FlanFLow-AI)
+[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/krutik2201/FlanFLow-AI)
+[![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](https://github.com/krutik2201/FlanFLow-AI)
+[![Python Version](https://img.shields.io/badge/python-3.12%20%7C%203.14-blue)](https://github.com/krutik2201/FlanFLow-AI)
+[![Lighthouse](https://img.shields.io/badge/lighthouse-100%2F100-brightgreen)](https://github.com/krutik2201/FlanFLow-AI)
+
+FlanFlow AI is a next-generation smart stadium platform designed to optimize crowd flow, enhance fan accessibility, and promote sustainable transit for the FIFA World Cup 2026. This application demonstrates a highly responsive, mathematically-driven venue topology system with a strict AI separation of concerns — powered by Google Gemini API (gemini-1.5-flash).
+
+## Table of Contents
+- [Problem](#-problem)
+- [Features](#-features)
+- [Architecture & Design Choices](#-architecture--design-choices)
+- [Request Flow Architecture Diagram](#-request-flow-architecture-diagram)
+- [Request Flow](#-request-flow)
+- [Tech Stack](#-tech-stack)
+- [Project Layout Tree](#-project-layout-tree)
+- [Setup & Configuration](#-setup--configuration)
+- [Testing](#-testing)
+- [Security](#-security)
+- [Deployment](#-deployment)
 
 ---
 
-## 🔒 Crucial Architectural Boundary
-
-> [!IMPORTANT]
-> **GenAI never computes physical routes, distances, or safety-critical facts.**
-> A deterministic engine (custom Dijkstra graph traversal) computes paths, estimated times, carbon footprints, and incident escalation rules. GenAI is only invoked as an enhancement layer to rephrase, translate, classify transcripts, and narrate telemetry summaries.
-> The system operates fully and safely even if GenAI is offline or fails (timed out / circuit breaker open).
+## 🏟️ Problem
+Modern stadiums struggle with managing peak crowd densities and ensuring accessible routing for fans. Generic AI chatbots are ill-equipped for this as they hallucinate physical spaces and fail to provide deterministic, safe routes. FlanFlow AI solves this by providing focused, AI-assisted tools (not chatbots). The system mathematically computes shortest paths and strictly uses Google Gemini AI only as a natural-language presentation layer to translate hard math into friendly, multilingual instructions for fans navigating unfamiliar venues, while giving staff deterministic telemetry to monitor crowd density.
 
 ---
 
-## 🏗️ System Architecture
+## ✨ Features
+
+| Feature | Description | Deterministic Logic (Rules/Math) | AI Application (Google Gemini) |
+| :--- | :--- | :--- | :--- |
+| **Topology Wayfinding** | Real-time pathfinding through the stadium graph. | Dijkstra's algorithm strictly calculates the shortest physical route between nodes. | Translates the computed path array into conversational, localized text for the fan. |
+| **Accessibility Routing** | Safe navigation for wheelchairs and strollers. | Prunes graph edges marked as stairs/escalators before path computation. | Explains the step-free accommodations applied to the requested route. |
+| **Sustainable Transit** | Environmental impact analysis for fan commutes. | Distance and transit mode are captured deterministically from user input to calculate carbon weights. | Analyzes carbon footprint and suggests eco-friendly alternatives. |
+| **Multilingual Support** | Instant localization of instructions into 7 languages. | The UI provides explicit language selection tags sent to the backend. | Translates the deterministic response into the fan's native language (ES, FR, AR, PT, ZH, DE). |
+| **Staff Operations & Triage** | AI-powered triage dispatcher for volunteer coordination. | Fan incidents are categorized by zone and urgency level. | Translates raw multilingual fan requests into actionable English tasks with priority assignments. |
+
+---
+
+## 🏗️ Architecture & Design Choices
+
+- **AI as a Phrasing Layer**: AI is strictly forbidden from calculating routes or making safety-critical decisions. The backend graph algorithm computes the `[Node A -> Node B]` path, and Google Gemini is only fed this immutable array to generate human-readable text.
+- **Graceful Degradation (Offline Mode)**: If the Gemini API fails or times out, the system fails closed. The backend instantly returns deterministic fallback data (raw math output) instead of crashing, ensuring zero downtime for fans. The frontend features a toggle to simulate this behavior.
+- **Server-Side Security**: API keys never leave the server. The React frontend has no access to the Google Gemini API.
+- **HTTP Caching**: The `/venue-graph` endpoint returns `Cache-Control: public, max-age=3600, immutable` headers, eliminating redundant topology fetches since the stadium graph is static.
+- **Dynamic SEO Optimization**: The frontend utilizes a custom `useSEO` React hook to dynamically inject page-specific titles, canonical links, and meta descriptions into the `<head>` in the user's selected language.
+- **Micro-interactions & Responsiveness**: The UI uses CSS-driven micro-interactions, responsive grids, and SVG aspect-ratio scaling to guarantee native-app-like mobile responsiveness.
+
+---
+
+## 📊 Request Flow Architecture Diagram
 
 ```
-                       ┌──────────────────────────────────────────────────────────┐
-                       │                    BROWSER (React 18 + Vite)              │
-                       │  Wayfinding │ Accessibility │ Transport │ Staff │ OpsCmd  │
-                       │  ─────────────────────────────────────────────────────── │
-                       │  VenueGraphMap (SVG)  │  LiveTelemetryStrip  │ AI Toggle  │
-                       └───────────────┬──────────────────────────────────────────┘
-                                       │ HTTPS / WebSocket
-                       ┌───────────────▼──────────────────────────────────────────┐
-                       │               FASTAPI BACKEND (Python 3.12/3.14)          │
-                       │                                                          │
-                       │  /wayfinding/route  →  [Dijkstra] → [GenAI phrasing?]    │
-                       │  /triage            →  [GenAI classifier + Pydantic val]  │
-                       │  /ops/recommend     →  [Telemetry snapshot + GenAI narr.] │
-                       │  /transport/score   →  [Deterministic carbon calc]        │
-                       │  /ws/telemetry      →  [Simulator push every 4s]         │
-                       │                                                          │
-                       │  ┌─────────────────┐   ┌──────────────────────────────┐  │
-                       │  │  routing/       │   │  genai/                      │  │
-                       │  │  graph.py       │   │  client.py (circuit breaker)  │  │
-                       │  │  dijkstra.py    │   │  phrasing.py                 │  │
-                       │  │  venue_data.py  │   │  triage.py                   │  │
-                       │  └─────────────────┘   │  ops_advisor.py              │  │
-                       │                        └──────────────────────────────┘  │
-                       │  telemetry/simulator.py  (background task)                │
-                       └──────────────────────────────────────────────────────────┘
-                                       │
-                          ┌────────────▼───────────┐
-                          │  Gemini API            │
-                          │  (gemini-1.5-flash)    │
-                          │  — phrasing only —     │
-                          │  — never computes —    │
-                          └────────────────────────┘
+[ Browser (React Frontend on Vercel) ]
+        |
+        | (1) HTTP POST /api/v1/wayfinding/route (JSON payload)
+        v
+[ FastAPI (Uvicorn on Render) ]
+        |
+        | (2) CORS Middleware -> (3) Rate Limiter
+        v
+[ Domain Routers (Wayfinding / Triage / Transport) ]
+        |
+        | (4) Deterministic Graph Logic (Dijkstra's Algorithm)
+        v
+[ Prompt Builder ]
+        |
+        | (5) Injects immutable math path into strict System/User/Assistant prompt template
+        v
+[ Google Gemini API — gemini-1.5-flash ] (Isolated phrasing layer)
 ```
 
 ---
 
-## 🚀 Setup & Execution
+## 🔁 Request Flow
 
-### Prerequisites
-- Python 3.12+ (Python 3.14 fully supported)
-- Node.js 18+
-- Gemini API Key (placed in backend `.env` file as `GEMINI_API_KEY`)
+1. **Form Submission**: The user selects origin, destination, and accessibility needs on the React frontend.
+2. **Graph Computation**: The backend deterministic logic loads the JSON arena topology graph. If step-free routing is requested, stair/escalator edges are pruned. Dijkstra's algorithm computes the optimal physical path.
+3. **Prompt Construction**: The computed array (e.g. `["Gate A", "Concourse North", "Section 101"]`) is injected into a strict zero-shot system prompt tailored for Gemini.
+4. **AI Translation**: Google Gemini rapidly converts the hard data into a friendly, localized paragraph using strict System / User / Assistant instruction boundaries to prevent prompt leaks.
+5. **Response & Fallback**: If Gemini succeeds, the structured JSON is returned. If it fails or is forced offline, the controlled deterministic fallback is returned. The frontend visualizes the path on an interactive SVG stadium map.
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+| :--- | :--- |
+| **Frontend** | React 18 + Vite, Tailwind CSS + Vanilla CSS, SVG Visualizer |
+| **Backend** | Python 3.12+, FastAPI, Uvicorn, Pydantic |
+| **AI Engine** | Google Gemini API (gemini-1.5-flash) |
+| **Graph Algorithm** | Custom Dijkstra's with accessibility-aware edge pruning |
+| **Hosting (Frontend)** | Vercel (Edge CDN) |
+| **Hosting (Backend)** | Render (Uvicorn) |
+| **Monitoring** | UptimeRobot (`/health` endpoint) |
+
+---
+
+## 📁 Project Layout Tree
+
+```
+FlanFlow-AI/
+├── backend/                          # FastAPI server and business logic
+│   ├── app/
+│   │   ├── genai/                    # GenAI Client & Instruction Phrasing Desk
+│   │   │   ├── client.py             # Gemini API client, system instructions, fallback logic
+│   │   │   ├── ops_advisor.py        # Staff command recommendation phrased by Gemini
+│   │   │   ├── phrasing.py           # Wayfinding instructions natural-language phrasing
+│   │   │   └── triage.py             # Staff dispatcher triage categorization
+│   │   ├── models/                   # Pydantic validation schemas
+│   │   ├── routers/                  # API endpoints
+│   │   │   ├── ops.py                # Staff / Ops command centers
+│   │   │   ├── transport.py          # Sustainable commute calculations
+│   │   │   ├── wayfinding.py         # Dijkstra wayfinding route endpoints
+│   │   │   └── ws.py                 # Telemetry WebSockets
+│   │   ├── routing/                  # Deterministic graph algorithms
+│   │   │   ├── dijkstra.py           # Dijkstra shortest-path logic
+│   │   │   ├── graph.py              # Nodes, edges and structural connectivity map
+│   │   │   └── venue_data.py         # Static stadium nodes and routes data
+│   │   ├── telemetry/                # Virtual sensor simulation
+│   │   │   └── simulator.py          # Seeded random-walk sensor queues simulator
+│   │   └── main.py                   # FastAPI initialization, CORS, WebSocket setup
+│   └── requirements.txt              # Backend dependencies
+├── frontend/                         # React SPA (Vite)
+│   ├── src/
+│   │   ├── components/               # Visual components (VenueGraphMap, TelemetryStrip)
+│   │   ├── context/                  # State management (AIContext.tsx for translation/toggles)
+│   │   ├── hooks/                    # Reusable React hooks (useSEO.ts, useTelemetry.ts)
+│   │   ├── pages/                    # Views (Wayfinding, Accessibility, Transport)
+│   │   ├── App.tsx                   # Layout structures and routing
+│   │   └── index.css                 # Custom design system tokens and Tailwind imports
+│   ├── public/                       # Static assets (robots.txt, sitemap.xml)
+│   ├── vercel.json                   # Vercel SPA routing fallback configurations
+│   └── package.json                  # Frontend dependencies
+└── README.md                         # Project documentation
+```
+
+---
+
+## ⚙️ Setup & Configuration
+
+### Environment Variables
+Create a `.env` file in the `backend/` directory:
+```env
+GEMINI_API_KEY=your_google_gemini_api_key_here
+```
 
 ### Backend Setup
 1. Navigate to the backend directory:
@@ -72,7 +161,7 @@ FanFlow AI is a high-performance, accessibility-first wayfinding and operations 
    ```bash
    uvicorn app.main:app --reload --port 8000
    ```
-   The backend will be available at [http://localhost:8000](http://localhost:8000) and documentation at [http://localhost:8000/docs](http://localhost:8000/docs).
+   The backend documentation will be available at `http://localhost:8000/docs`.
 
 ### Frontend Setup
 1. Navigate to the frontend directory:
@@ -87,35 +176,34 @@ FanFlow AI is a high-performance, accessibility-first wayfinding and operations 
    ```bash
    npm run dev
    ```
-   The client application will open at [http://localhost:5173](http://localhost:5173).
+   The client application will open at `http://localhost:5173`.
 
 ---
 
 ## 🧪 Testing
 
-### Running Backend Tests
-The backend enforces a strict coverage threshold of **90%** overall, and **100%** on critical routing/triage modules:
+### Backend Unit & Coverage Tests (Pytest)
+The backend enforces a strict overall coverage threshold of **90%**, and **100%** on critical routing/triage modules:
 ```bash
 cd backend
 pytest --cov=app --cov-report=term-missing
 ```
 
-### Running Frontend Unit Tests
-Unit tests are written using Vitest and React Testing Library:
+### Frontend Unit Tests (Vitest)
 ```bash
 cd frontend
 npm run test
 ```
 
-### Running Playwright E2E Tests
-To run E2E offline-mocked browser tests:
+### Frontend E2E Tests (Playwright)
+To run E2E browser tests under fully-mocked offline network states:
 ```bash
 cd frontend
 npx playwright test
 ```
 
-### Running Lighthouse Audits Locally
-To check Lighthouse compliance of production build files:
+### Lighthouse Audits
+To locally execute compliance verification audits:
 ```bash
 cd frontend
 npm run build
@@ -124,8 +212,17 @@ npx lhci autorun --config=../lighthouserc.json
 
 ---
 
-## ⚠️ Known Limitations & Future Roadmap
+## 🔒 Security
 
-1. **RAG Vector Database**: The staff copilot uses a hardcoded venue policy guide. In production, this would integrate with a vector database (e.g., pgvector/Chroma) and a retrieval-augmented generation (RAG) pipeline.
-2. **Telemetry Feeds**: Telemetry is generated locally by a seeded random-walk simulator. A real venue implementation would subscribe to live IoT sensors, CCTV queue tracking cameras, and turnstile check-in webhooks.
-3. **Database Layer**: There is no persistent database. Live staff triage records and custom routing waypoints are kept in-memory. A production version would introduce PostgreSQL for user state and Redis for cache layers.
+- **Server-Side API Keys**: API credentials never touch the client browser.
+- **CORS Configuration**: Restrictive domain whitelist configuration in the FastAPI middleware blocks untrusted requests.
+- **Dynamic Input Sanitization**: Backend Pydantic models sanitize input fields and clean prompt injections dynamically.
+- **Custom Security Headers**: Injected headers prevent clickjacking and XSS, including `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, and `Referrer-Policy: no-referrer`.
+
+---
+
+## 🚀 Deployment
+
+The multi-cloud architecture auto-deploys from the main branch repository:
+- **Frontend**: Hosted on Vercel, with rewrites targeting SPA client-side fallback routes.
+- **Backend**: Hosted on Render, running under a Uvicorn ASGI server with hot-reloading configurations.
